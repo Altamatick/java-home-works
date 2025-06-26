@@ -6,6 +6,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Converter App.");
         double kgs = 5;
+        System.out.println("Version 1.0.");
         double pnds = 12;
         double kilos = convPoundsToKgs(pnds);
         System.out.println("Result is " + pounds + " pounds and "
