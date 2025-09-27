@@ -1,24 +1,36 @@
 package app;
 
+import java.util.Scanner;
+import app.helper.ConverterHelper;
+import app.helper.ProjectInfoHelper;
+
 public class Main {
-    private static final double CONV_K = 2.20462;
-
     public static void main(String[] args) {
-        System.out.println("App for measures converting.");
-        System.out.println("Version 1.0.");
-        double kgs = 5;
-        double pnds = 12;
-        double pounds = convKgsToPounds (kgs) ;
-        double kilos = convPoundsToKgs(pnds) ;
-        System.out.println("Result is " + pounds + " pounds and "
-                + kilos + " kgs.");
-    }
+        String version = "1.1";
+        String date = "September 27, 2025";
+        System.out.println(ProjectInfoHelper.getProjectInfo(version, date));
 
-    private static double convKgsToPounds(double kgs) {
-        return kgs * CONV_K;
-    }
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Choose conversion:");
+        System.out.println("1 - Miles to Kilometers");
+        System.out.println("2 - Kilometers to Miles");
+        System.out.print("Enter 1 or 2: ");
+        int choice = scanner.nextInt();
 
-    private static double convPoundsToKgs(double pnds) {
-        return pnds / CONV_K;
+        if (choice == 1) {
+            System.out.print("Enter miles: ");
+            double miles = scanner.nextDouble();
+            double kilometers = ConverterHelper.milesToKm(miles);
+            System.out.println(miles + " miles = " + kilometers + " km");
+            return;
+        }
+        if (choice == 2) {
+            System.out.print("Enter kilometers: ");
+            double kms = scanner.nextDouble();
+            double milesResult = ConverterHelper.kmToMiles(kms);
+            System.out.println(kms + " km = " + milesResult + " miles");
+            return;
+        }
+        System.out.println("Invalid choice.");
     }
 }
