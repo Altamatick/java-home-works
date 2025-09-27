@@ -13,6 +13,14 @@ public class ConverterHelper {
         return km * KM_TO_MILES;
     }
 
+    public static double fahrenheitToCelsius(double fahrenheit) {
+        return (fahrenheit - 32) * 5.0 / 9.0;
+    }
+
+    public static double celsiusToFahrenheit(double celsius) {
+        return celsius * 9.0 / 5.0 + 32;
+    }
+
     private static double convKgsToPounds(double kgs) {
         return kgs * CONV_K;
     }
@@ -21,4 +29,3 @@ public class ConverterHelper {
         return pnds / CONV_K;
     }
 }
-

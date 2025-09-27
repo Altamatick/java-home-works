@@ -14,7 +14,9 @@ public class Main {
         System.out.println("Choose conversion:");
         System.out.println("1 - Miles to Kilometers");
         System.out.println("2 - Kilometers to Miles");
-        System.out.print("Enter 1 or 2: ");
+        System.out.println("3 - Fahrenheit to Celsius");
+        System.out.println("4 - Celsius to Fahrenheit");
+        System.out.print("Enter 1, 2, 3 or 4: ");
         int choice = scanner.nextInt();
 
         if (choice == 1) {
@@ -29,6 +31,20 @@ public class Main {
             double kms = scanner.nextDouble();
             double milesResult = ConverterHelper.kmToMiles(kms);
             System.out.println(kms + " km = " + milesResult + " miles");
+            return;
+        }
+        if (choice == 3) {
+            System.out.print("Enter Fahrenheit: ");
+            double fahrenheit = scanner.nextDouble();
+            double celsius = ConverterHelper.fahrenheitToCelsius(fahrenheit);
+            System.out.println(fahrenheit + " F = " + celsius + " C");
+            return;
+        }
+        if (choice == 4) {
+            System.out.print("Enter Celsius: ");
+            double celsius = scanner.nextDouble();
+            double fahrenheit = ConverterHelper.celsiusToFahrenheit(celsius);
+            System.out.println(celsius + " C = " + fahrenheit + " F");
             return;
         }
         System.out.println("Invalid choice.");
