@@ -1,98 +1,90 @@
 package app;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
+import com.example.PasswordGenerator;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== Демонстрація роботи з анотаціями ===\n");
+        Scanner scanner = new Scanner(System.in);
 
-        // Демонстрація роботи методів ArrayUtils
-        demonstrateArrayUtils();
+        System.out.println("=== Додаток для генерації паролів ===");
+        System.out.println("Використовує бібліотеку Password Generator v1.0");
+        System.out.println();
 
-        // Отримання інформації про анотації методів
-        System.out.println("\n=== Інформація про анотації методів ===\n");
-        displayMethodAnnotations();
-    }
+        while (true) {
+            System.out.println("Меню:");
+            System.out.println("1. Згенерувати пароль");
+            System.out.println("2. Згенерувати кілька паролів");
+            System.out.println("3. Вийти");
+            System.out.print("Виберіть опцію (1-3): ");
 
-    private static void demonstrateArrayUtils() {
-        System.out.println("1. Генерація випадкового масиву:");
-        int[] array = ArrayUtils.generateRandomArray(10, 1, 100);
-        System.out.print("Випадковий масив: ");
-        ArrayUtils.printArray(array);
+            int choice = scanner.nextInt();
 
-        System.out.println("\n2. Пошук мін/макс елементів:");
-        System.out.println("Мінімальний елемент: " + ArrayUtils.findMin(array));
-        System.out.println("Максимальний елемент: " + ArrayUtils.findMax(array));
-
-        System.out.println("\n3. Сортування масиву:");
-        System.out.print("До сортування: ");
-        ArrayUtils.printArray(array);
-        ArrayUtils.mergeSort(array);
-        System.out.print("Після сортування: ");
-        ArrayUtils.printArray(array);
-
-        System.out.println("\n4. Бінарний пошук:");
-        int target = array[array.length / 2];
-        int index = ArrayUtils.binarySearch(array, target);
-        System.out.println("Пошук елемента " + target + ": знайдено на позиції " + index);
-    }
-
-    private static void displayMethodAnnotations() {
-        Class<?> clazz = ArrayUtils.class;
-        Method[] methods = clazz.getDeclaredMethods();
-
-        int annotatedMethodCount = 0;
-
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(MethodInfo.class) &&
-                method.isAnnotationPresent(Author.class)) {
-
-                annotatedMethodCount++;
-
-                MethodInfo methodInfo = method.getAnnotation(MethodInfo.class);
-                Author author = method.getAnnotation(Author.class);
-
-                System.out.println("┌─────────────────────────────────────────┐");
-                System.out.printf("│ Метод #%-2d                               │%n", annotatedMethodCount);
-                System.out.println("├─────────────────────────────────────────┤");
-                System.out.printf("│ Назва: %-32s │%n", methodInfo.name());
-                System.out.printf("│ Тип повернення: %-23s │%n", methodInfo.returnType());
-                System.out.printf("│ Опис: %-34s│%n", truncateDescription(methodInfo.description()));
-                System.out.printf("│ Автор: %-7s %-22s   │%n", author.firstName(), author.lastName());
-                System.out.printf("│ Java метод: %-27s │%n", method.getName());
-                System.out.printf("│ Параметри: %-28s │%n", getParametersString(method));
-                System.out.println("└─────────────────────────────────────────┘");
-                System.out.println();
+            switch (choice) {
+                case 1:
+                    generateSinglePassword(scanner);
+                    break;
+                case 2:
+                    generateMultiplePasswords(scanner);
+                    break;
+                case 3:
+                    System.out.println("До побачення!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Невірний вибір. Спробуйте ще раз.");
             }
+            System.out.println();
         }
-
-        System.out.println("Загальна кількість анотованих методів: " + annotatedMethodCount);
     }
 
-    private static String truncateDescription(String description) {
-        if (description.length() > 34) {
-            return description.substring(0, 31) + "...";
+    private static void generateSinglePassword(Scanner scanner) {
+        System.out.print("Введіть довжину пароля (мінімум 1): ");
+        int length = scanner.nextInt();
+
+        if (length < 1) {
+            System.out.println("Помилка: довжина пароля має бути більше 0");
+            return;
         }
-        return description;
+
+        try {
+            String password = PasswordGenerator.generatePassword(length);
+            System.out.println("Згенерований пароль: " + password);
+            System.out.println("Довжина: " + password.length() + " символів");
+
+            System.out.println("Перевірка випадковості - ще один пароль тієї ж довжини:");
+            String password2 = PasswordGenerator.generatePassword(length);
+            System.out.println("Другий пароль: " + password2);
+            System.out.println("Паролі однакові: " + password.equals(password2));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Помилка: " + e.getMessage());
+        }
     }
 
-    private static String getParametersString(Method method) {
-        Class<?>[] paramTypes = method.getParameterTypes();
-        if (paramTypes.length == 0) {
-            return "немає";
+    private static void generateMultiplePasswords(Scanner scanner) {
+        System.out.print("Введіть довжину пароля: ");
+        int length = scanner.nextInt();
+        System.out.print("Введіть кількість паролів: ");
+        int count = scanner.nextInt();
+
+        if (length < 1) {
+            System.out.println("Помилка: довжина пароля має бути більше 0");
+            return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < paramTypes.length; i++) {
-            if (i > 0) sb.append(", ");
-            sb.append(paramTypes[i].getSimpleName());
+        if (count < 1 || count > 20) {
+            System.out.println("Помилка: кількість паролів має бути від 1 до 20");
+            return;
         }
 
-        String result = sb.toString();
-        if (result.length() > 28) {
-            return result.substring(0, 25) + "...";
+        try {
+            System.out.println("Згенеровані паролі:");
+            for (int i = 1; i <= count; i++) {
+                String password = PasswordGenerator.generatePassword(length);
+                System.out.printf("%2d. %s%n", i, password);
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Помилка: " + e.getMessage());
         }
-        return result;
     }
 }
