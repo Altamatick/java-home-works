@@ -2,7 +2,7 @@ package app;
 
 public class DataRepository {
 
-    public String[] getData() {
-        return new String[] {"orange", "apple", "plum", "mango"};
+    public int[] getData() {
+        return new int[] {7, 4, 5, 2};
     }
 }

@@ -1,20 +1,18 @@
 package app;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DataHandler {
 
-    String[] fruits = new DataRepository().getData();
+    private final ReentrantLock lock = new ReentrantLock();
 
-    public void getOutput() {
-        synchronized (this) {
-            StringBuilder sb = new StringBuilder();
-            AtomicInteger count = new AtomicInteger(1);
-            for (String fruit : fruits) {
-                sb.append(String.format("(%d) %s ",
-                        count.getAndIncrement(), fruit));
-            }
-            System.out.println(Thread.currentThread().getName() + ": " + sb);
+    public int modify(int num) {
+        lock.lock();
+        try {
+            num = num * 3;
+            return num;
+        } finally {
+            lock.unlock();
         }
     }
 }
