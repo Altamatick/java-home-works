@@ -1,32 +1,38 @@
 package app;
 
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class FileHandler {
 
-    private final static String BASE_PATH = "files/";
-
-    public String writeFile(String fileName, String fileContent) {
-        try(FileWriter fw = new FileWriter(BASE_PATH + fileName)) {
-            fw.write(fileContent);
-            return "Success.";
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
+    public String createFile(String path) {
+        Path newFile;
+        try {
+            newFile = Files.createFile(Path.of(path));
+        } catch (FileAlreadyExistsException e) {
+            return "File already exists!";
+        } catch (IOException e) {
+            return "Something wrong " + e.getMessage();
         }
+        return "Created " + newFile;
     }
 
-    public String readFile(String fileName) {
-        try (FileReader reader = new FileReader(BASE_PATH + fileName)) {
-            int sym;
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((sym = reader.read()) != -1) {
-                stringBuilder.append((char) sym);
-            }
-            return stringBuilder.toString();
-        } catch (IOException ex) {
-            return ex.getMessage();
+    public String writeToFile(String path, String content) {
+        try {
+            Files.writeString(Path.of(path), content);
+        } catch (IOException e) {
+            return e.getMessage();
+        }
+        return "Recorded in " + path;
+    }
+
+    public String readFromFile(String path) {
+        try {
+            return Files.readString(Path.of(path));
+        } catch (IOException e) {
+            return "Something wrong " + e.getMessage();
         }
     }
 }

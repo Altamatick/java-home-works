@@ -2,16 +2,16 @@ package app;
 
 public class Main {
 
-    private final static String BASE_PATH = "files/";
+    private static final String BASE_PATH = "files/";
 
     public static void main(String[] args) {
         FileHandler handler = new FileHandler();
-        String fileName = "myfile.txt";
-        String fileContent = "My very important information.";
-        String result = handler.writeFile(fileName, fileContent);
-        String content = handler.readFile(fileName);
-        getOutput("RESULT: " + result);
-        getOutput("FILE CONTENT: " + content);
+        String newFileName = "myfile";
+        String content = "Super information.";
+        String path = BASE_PATH + newFileName + ".txt";
+        getOutput(handler.createFile(path));
+        getOutput(handler.writeToFile(path, content));
+        getOutput("CONTENT: " + handler.readFromFile(path));
     }
 
     private static void getOutput(String output) {
