@@ -2,17 +2,16 @@ package app;
 
 public class Main {
 
+    private final static String BASE_PATH = "files/";
+
     public static void main(String[] args) {
-
-        DataProvider provider = new DataProvider();
-        DataHandler<String> stringHandler = new DataHandler<>();
-        DataHandler<Double> doubleHandler = new DataHandler<>();
-
-        String namesOutput = stringHandler.handleData(provider.getProductNames());
-        getOutput("Products: " + namesOutput);
-
-        String salesOutput = doubleHandler.handleData(provider.getSalesAmounts());
-        getOutput("Sales, EUR: " + salesOutput);
+        FileHandler handler = new FileHandler();
+        String fileName = "myfile.txt";
+        String fileContent = "My very important information.";
+        String result = handler.writeFile(fileName, fileContent);
+        String content = handler.readFile(fileName);
+        getOutput("RESULT: " + result);
+        getOutput("FILE CONTENT: " + content);
     }
 
     private static void getOutput(String output) {
