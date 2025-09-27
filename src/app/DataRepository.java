@@ -1,8 +1,16 @@
 package app;
 
-public class DataRepository {
+import java.util.ArrayList;
+import java.util.List;
 
-    public int[] getData() {
-        return new int[] {7, 4, 5, 2};
+public class DataRepository {
+    public List<String> getData() {
+        List<String> list = new ArrayList<>();
+        list.add("Alice");
+        list.add("Bob");
+        list.add("Lucy");
+        list.add("Denis");
+        list.add("Tom");
+        return list;
     }
 }
