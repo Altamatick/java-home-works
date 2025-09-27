@@ -1,103 +1,104 @@
 package app;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        // Створюємо репозиторій користувачів
-        UserRepository userRepository = new UserRepository();
+        System.out.println("=== Демонстрація алгоритмів сортування та пошуку ===\n");
 
-        System.out.println("=== Демонстрація роботи з Optional у UserRepository ===\n");
+        // 1. Створення та заповнення масиву випадковими числами
+        int arraySize = 15;
+        int minValue = 1;
+        int maxValue = 100;
 
-        // 1. Пошук користувача за ID
-        System.out.println("1. Пошук користувача за ID:");
-        demonstrateSearchById(userRepository, 3); // існуючий користувач
-        demonstrateSearchById(userRepository, 99); // неіснуючий користувач
+        int[] originalArray = ArrayUtils.generateRandomArray(arraySize, minValue, maxValue);
+        ArrayUtils.printArray(originalArray, "Оригінальний масив");
 
-        // 2. Пошук користувача за email
-        System.out.println("\n2. Пошук користувача за email:");
-        demonstrateSearchByEmail(userRepository, "alice@example.com"); // існуючий email
-        demonstrateSearchByEmail(userRepository, "nonexistent@example.com"); // неіснуючий email
+        // 2. Створення копії для сортування (щоб зберегти оригінальний)
+        int[] arrayToSort = Arrays.copyOf(originalArray, originalArray.length);
 
-        // 3. Отримання списку всіх користувачів
-        System.out.println("\n3. Отримання списку всіх користувачів:");
-        demonstrateGetAllUsers(userRepository);
+        // 3. Застосування сортування злиттям
+        System.out.println("\n=== Сортування злиттям ===");
+        long startTime = System.nanoTime();
+        ArrayUtils.mergeSort(arrayToSort);
+        long endTime = System.nanoTime();
 
-        // 4. Додаткові демонстрації Optional методів
-        System.out.println("\n4. Додаткові методи Optional:");
-        demonstrateOptionalMethods(userRepository);
-    }
+        ArrayUtils.printArray(arrayToSort, "Відсортований масив");
+        System.out.printf("Час сортування: %.3f мс\n", (endTime - startTime) / 1_000_000.0);
 
-    // Демонстрація пошуку за ID
-    private static void demonstrateSearchById(UserRepository repository, int id) {
-        System.out.println("Шукаємо користувача з ID: " + id);
-        Optional<User> userOptional = repository.findUserById(id);
+        // 4. Демонстрація бінарного пошуку
+        System.out.println("\n=== Бінарний пошук ===");
 
-        if (userOptional.isPresent()) {
-            System.out.println("Знайдено: " + userOptional.get());
-        } else {
-            System.out.println("Користувача з ID " + id + " не знайдено");
-        }
-        System.out.println("---");
-    }
+        // Пошук існуючих елементів
+        int[] searchTargets = {arrayToSort[0], arrayToSort[arrayToSort.length / 2], arrayToSort[arrayToSort.length - 1]};
+        binarySearch(searchTargets, arrayToSort);
 
-    // Демонстрація пошуку за email
-    private static void demonstrateSearchByEmail(UserRepository repository, String email) {
-        System.out.println("Шукаємо користувача з email: " + email);
-        Optional<User> userOptional = repository.findUserByEmail(email);
+        // Пошук неіснуючих елементів
+        int[] nonExistentTargets = {0, 150, -5};
+        System.out.println("\nПошук неіснуючих елементів:");
+        binarySearch(nonExistentTargets, arrayToSort);
 
-        userOptional.ifPresentOrElse(
-            user -> System.out.println("Знайдено користувача: " + user),
-            () -> System.out.println("Користувача з email " + email + " не знайдено")
-        );
+        // 5. Порівняння з вбудованими методами Java
+        System.out.println("\n=== Порівняння з вбудованими методами ===");
 
-        // Використання map для отримання імені
-        String userName = userOptional
-            .map(User::getName)
-            .orElse("Невідомий користувач");
-        System.out.println("Ім'я користувача: " + userName);
-        System.out.println("---");
-    }
+        int[] javaArray = Arrays.copyOf(originalArray, originalArray.length);
+        startTime = System.nanoTime();
+        Arrays.sort(javaArray);
+        endTime = System.nanoTime();
 
-    // Демонстрація отримання всіх користувачів
-    private static void demonstrateGetAllUsers(UserRepository repository) {
-        Optional<List<User>> usersOptional = repository.findAllUsers();
+        System.out.printf("Час вбудованого сортування Java: %.3f мс\n", (endTime - startTime) / 1_000_000.0);
 
-        if (usersOptional.isPresent()) {
-            List<User> users = usersOptional.get();
-            System.out.println("Знайдено " + users.size() + " користувачів:");
-            users.forEach(user -> System.out.println("  " + user));
-        } else {
-            System.out.println("Список користувачів порожній");
-        }
-    }
+        // Перевірка, чи результати однакові
+        boolean arraysEqual = Arrays.equals(arrayToSort, javaArray);
+        System.out.printf("Результати сортування однакові: %s\n", arraysEqual);
 
-    // Додаткові демонстрації Optional методів
-    private static void demonstrateOptionalMethods(UserRepository repository) {
-        // filter + map + orElseThrow
-        try {
-            User adminUser = repository.findUserById(1)
-                .filter(user -> user.getEmail().contains("alice"))
-                .map(user -> new User(user.getId(), user.getName() + " (Admin)", user.getEmail()))
-                .orElseThrow(() -> new RuntimeException("Admin користувач не знайдений"));
+        // Порівняння бінарного пошуку
+        int testTarget = arrayToSort[5];
+        int ourResult = ArrayUtils.binarySearch(arrayToSort, testTarget);
+        int javaResult = Arrays.binarySearch(javaArray, testTarget);
 
-            System.out.println("Admin користувач: " + adminUser);
-        } catch (RuntimeException e) {
-            System.out.println("Помилка: " + e.getMessage());
+        System.out.printf("Наш бінарний пошук знайшов %d на позиції: %d\n", testTarget, ourResult);
+        System.out.printf("Java бінарний пошук знайшов %d на позиції: %d\n", testTarget, javaResult);
+
+        // 6. Додаткова демонстрація з різними розмірами масивів
+        System.out.println("\n=== Тестування з різними розмірами масивів ===");
+
+        int[] sizes = {10, 100, 1000};
+        for (int size : sizes) {
+            int[] testArray = ArrayUtils.generateRandomArray(size, 1, 1000);
+
+            startTime = System.nanoTime();
+            ArrayUtils.mergeSort(testArray);
+            endTime = System.nanoTime();
+
+            double sortTime = (endTime - startTime) / 1_000_000.0;
+            System.out.printf("Масив розміром %d елементів відсортовано за %.3f мс\n", size, sortTime);
+
+            // Перевірка правильності сортування
+            boolean isSorted = isSorted(testArray);
+            System.out.printf("Масив правильно відсортований: %s\n", isSorted);
         }
 
-        // Ланцюжок Optional операцій
-        String emailDomain = repository.findUserById(2)
-            .map(User::getEmail)
-            .map(email -> email.substring(email.indexOf("@") + 1))
-            .orElse("domain.com");
+        System.out.println("\n=== Демонстрація завершена ===");
+    }
 
-        System.out.println("Email домен користувача ID=2: " + emailDomain);
+    private static void binarySearch(int[] targets, int[] arr) {
+        for (int target : targets) {
+            int index = ArrayUtils.binarySearch(arr, target);
+            if (index != -1) {
+                System.out.printf("Знайдено %d на позиції %d\n", target, index);
+            } else {
+                System.out.printf("Елемент %d не знайдено (як і очікувалось)\n", target);
+            }
+        }
+    }
 
-        // flatMap приклад (якби у нас були вкладені Optional)
-        Optional<String> userInfo = repository.findUserById(4).map(user -> user.getName() + " - " + user.getEmail());
-
-        userInfo.ifPresent(info -> System.out.println("Інфо користувача: " + info));
+    private static boolean isSorted(int[] array) {
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < array[i - 1]) {
+                return false;
+            }
+        }
+        return true;
     }
 }
