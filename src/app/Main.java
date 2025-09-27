@@ -1,104 +1,52 @@
 package app;
 
-import java.util.Arrays;
-
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== Демонстрація алгоритмів сортування та пошуку ===\n");
+        System.out.println("=== Демонстрація роботи з графом ===\n");
 
-        // 1. Створення та заповнення масиву випадковими числами
-        int arraySize = 15;
-        int minValue = 1;
-        int maxValue = 100;
+        Graph graph = new Graph();
 
-        int[] originalArray = ArrayUtils.generateRandomArray(arraySize, minValue, maxValue);
-        ArrayUtils.printArray(originalArray, "Оригінальний масив");
+        System.out.println("1. Створення графу та додавання вершин:");
+        graph.addVertex(1);
+        graph.addVertex(2);
+        graph.addVertex(3);
+        graph.addVertex(4);
+        System.out.println("Додано вершини: 1, 2, 3, 4");
 
-        // 2. Створення копії для сортування (щоб зберегти оригінальний)
-        int[] arrayToSort = Arrays.copyOf(originalArray, originalArray.length);
+        System.out.println("\n2. Перевірка існування вершин:");
+        System.out.println("Вершина 1 існує: " + graph.hasVertex(1));
+        System.out.println("Вершина 2 існує: " + graph.hasVertex(2));
+        System.out.println("Вершина 5 існує: " + graph.hasVertex(5));
 
-        // 3. Застосування сортування злиттям
-        System.out.println("\n=== Сортування злиттям ===");
-        long startTime = System.nanoTime();
-        ArrayUtils.mergeSort(arrayToSort);
-        long endTime = System.nanoTime();
+        System.out.println("\n3. Додавання ребер:");
+        graph.addEdge(1, 2);
+        graph.addEdge(2, 3);
+        graph.addEdge(3, 4);
+        graph.addEdge(1, 4);
+        System.out.println("Додано ребра: (1-2), (2-3), (3-4), (1-4)");
 
-        ArrayUtils.printArray(arrayToSort, "Відсортований масив");
-        System.out.printf("Час сортування: %.3f мс\n", (endTime - startTime) / 1_000_000.0);
+        System.out.println("\n4. Перевірка існування ребер:");
+        System.out.println("Ребро (1-2) існує: " + graph.hasEdge(1, 2));
+        System.out.println("Ребро (1-3) існує: " + graph.hasEdge(1, 3));
+        System.out.println("Ребро (2-4) існує: " + graph.hasEdge(2, 4));
 
-        // 4. Демонстрація бінарного пошуку
-        System.out.println("\n=== Бінарний пошук ===");
+        System.out.println("\n5. Стан графу:");
+        graph.printGraph();
 
-        // Пошук існуючих елементів
-        int[] searchTargets = {arrayToSort[0], arrayToSort[arrayToSort.length / 2], arrayToSort[arrayToSort.length - 1]};
-        binarySearch(searchTargets, arrayToSort);
+        System.out.println("\n6. Видалення ребра (1-4):");
+        graph.removeEdge(1, 4);
+        System.out.println("Ребро (1-4) після видалення існує: " + graph.hasEdge(1, 4));
 
-        // Пошук неіснуючих елементів
-        int[] nonExistentTargets = {0, 150, -5};
-        System.out.println("\nПошук неіснуючих елементів:");
-        binarySearch(nonExistentTargets, arrayToSort);
+        System.out.println("\n7. Стан графу після видалення ребра:");
+        graph.printGraph();
 
-        // 5. Порівняння з вбудованими методами Java
-        System.out.println("\n=== Порівняння з вбудованими методами ===");
+        System.out.println("\n8. Видалення вершини 3:");
+        graph.removeVertex(3);
+        System.out.println("Вершина 3 після видалення існує: " + graph.hasVertex(3));
 
-        int[] javaArray = Arrays.copyOf(originalArray, originalArray.length);
-        startTime = System.nanoTime();
-        Arrays.sort(javaArray);
-        endTime = System.nanoTime();
+        System.out.println("\n9. Фінальний стан графу:");
+        graph.printGraph();
 
-        System.out.printf("Час вбудованого сортування Java: %.3f мс\n", (endTime - startTime) / 1_000_000.0);
-
-        // Перевірка, чи результати однакові
-        boolean arraysEqual = Arrays.equals(arrayToSort, javaArray);
-        System.out.printf("Результати сортування однакові: %s\n", arraysEqual);
-
-        // Порівняння бінарного пошуку
-        int testTarget = arrayToSort[5];
-        int ourResult = ArrayUtils.binarySearch(arrayToSort, testTarget);
-        int javaResult = Arrays.binarySearch(javaArray, testTarget);
-
-        System.out.printf("Наш бінарний пошук знайшов %d на позиції: %d\n", testTarget, ourResult);
-        System.out.printf("Java бінарний пошук знайшов %d на позиції: %d\n", testTarget, javaResult);
-
-        // 6. Додаткова демонстрація з різними розмірами масивів
-        System.out.println("\n=== Тестування з різними розмірами масивів ===");
-
-        int[] sizes = {10, 100, 1000};
-        for (int size : sizes) {
-            int[] testArray = ArrayUtils.generateRandomArray(size, 1, 1000);
-
-            startTime = System.nanoTime();
-            ArrayUtils.mergeSort(testArray);
-            endTime = System.nanoTime();
-
-            double sortTime = (endTime - startTime) / 1_000_000.0;
-            System.out.printf("Масив розміром %d елементів відсортовано за %.3f мс\n", size, sortTime);
-
-            // Перевірка правильності сортування
-            boolean isSorted = isSorted(testArray);
-            System.out.printf("Масив правильно відсортований: %s\n", isSorted);
-        }
-
-        System.out.println("\n=== Демонстрація завершена ===");
-    }
-
-    private static void binarySearch(int[] targets, int[] arr) {
-        for (int target : targets) {
-            int index = ArrayUtils.binarySearch(arr, target);
-            if (index != -1) {
-                System.out.printf("Знайдено %d на позиції %d\n", target, index);
-            } else {
-                System.out.printf("Елемент %d не знайдено (як і очікувалось)\n", target);
-            }
-        }
-    }
-
-    private static boolean isSorted(int[] array) {
-        for (int i = 1; i < array.length; i++) {
-            if (array[i] < array[i - 1]) {
-                return false;
-            }
-        }
-        return true;
+        System.out.println("\n=== Завдання виконано успішно! ===");
     }
 }
