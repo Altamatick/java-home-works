@@ -1,68 +1,61 @@
 package app;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== Functional Programming Demo ===\n");
+        // Створення списку об'єктів класу Product
+        List<Product> products = Arrays.asList(
+                new Product("Laptop", "Electronics", 1200.0),
+                new Product("Coffee Maker", "Appliances", 80.0),
+                new Product("Headphones", "Electronics", 150.0),
+                new Product("Blender", "Appliances", 50.0),
+                new Product("Smartphone", "Electronics", 800.0),
+                new Product("Microwave", "Appliances", 120.0),
+                new Product("T-shirt", "Clothing", 25.0),
+                new Product("Jeans", "Clothing", 60.0)
+        );
 
-        // 1. Анонімний клас для MathOperation (додавання)
-        MathOperation addition = new MathOperation() {
-            @Override
-            public int operate(int a, int b) {
-                return a + b;
-            }
-        };
+        System.out.println("=== Всі продукти ===");
+        products.forEach(System.out::println);
 
-        int result1 = addition.operate(15, 25);
-        System.out.println("1. Anonymous class (addition): 15 + 25 = " + result1);
+        // Групування продуктів за категоріями та обчислення середньої ціни
+        Map<String, Double> categoryAverages = products.stream()
+                .collect(Collectors.groupingBy(Product::getCategory,
+                        Collectors.averagingDouble(Product::getPrice)));
 
-        // 2. Лямбда-вираз для StringManipulator (перетворення у верхній регістр)
-        StringManipulator toUpperCase = input -> input.toUpperCase();
+        System.out.println("\n=== Середня ціна по категоріях ===");
+        categoryAverages.forEach((category, avgPrice) ->
+                System.out.printf("%s: %.2f\n", category, avgPrice));
 
-        String testString = "Hello World!";
-        String result2 = toUpperCase.manipulate(testString);
-        System.out.println("2. Lambda expression (toUpperCase): '" + testString + "' -> '" + result2 + "'");
+        // Знаходження категорії з найвищою середньою ціною
+        var maxEntry = categoryAverages.entrySet().stream()
+                .max(Map.Entry.comparingByValue()); // один прохід O(n)
 
-        // 3. Посилання на метод для підрахунку великих літер
-        Function<String, Integer> uppercaseCounter = StringListProcessor::countUppercase;
+        String categoryWithHighestAvgPrice = maxEntry
+                .map(Map.Entry::getKey)
+                .orElse("Немає даних");
 
-        String testString2 = "Hello JAVA Programming!";
-        Integer result3 = uppercaseCounter.apply(testString2);
-        System.out.println("3. Method reference (countUppercase): '" + testString2 + "' has " + result3 + " uppercase letters");
+        double highestAvgPrice = maxEntry
+                .map(Map.Entry::getValue)
+                .orElse(0.0);
 
-        // 4. Supplier для генерації випадкових чисел від 1 до 100
-        Supplier<Integer> randomSupplier = () -> RandomNumberGenerator.generateRandomNumber(1, 100);
+        System.out.println("\n=== Результат ===");
+        System.out.printf("Категорія з найвищою середньою ціною: %s (%.2f)\n",
+                categoryWithHighestAvgPrice, highestAvgPrice);
 
-        System.out.println("4. Supplier (random numbers 1-100):");
-        for (int i = 0; i < 5; i++) {
-            Integer randomNumber = randomSupplier.get();
-            System.out.println("   Random number " + (i + 1) + ": " + randomNumber);
-        }
+        // Додаткова інформація: групування продуктів за категоріями
+        System.out.println("\n=== Продукти по категоріях ===");
+        Map<String, List<Product>> productsByCategory = products.stream()
+                .collect(Collectors.groupingBy(Product::getCategory));
 
-        // 5. Додаткові демонстрації
-        System.out.println("\n=== Additional Demonstrations ===");
-
-        // Інші математичні операції через лямбда-вирази
-        MathOperation multiplication = (a, b) -> a * b;
-        MathOperation subtraction = (a, b) -> a - b;
-
-        System.out.println("Multiplication: 8 * 7 = " + multiplication.operate(8, 7));
-        System.out.println("Subtraction: 20 - 12 = " + subtraction.operate(20, 12));
-
-        // Інші строкові маніпуляції
-        StringManipulator toLowerCase = String::toLowerCase;
-        StringManipulator reverse = input -> new StringBuilder(input).reverse().toString();
-
-        String sample = "Programming";
-        System.out.println("Original: " + sample);
-        System.out.println("To lower: " + toLowerCase.manipulate(sample));
-        System.out.println("Reversed: " + reverse.manipulate(sample));
-
-        // Тестування RandomNumberGenerator з різними діапазонами
-        System.out.println("\nRandom numbers in different ranges:");
-        System.out.println("Range 10-20: " + RandomNumberGenerator.generateRandomNumber(10, 20));
-        System.out.println("Range 50-60: " + RandomNumberGenerator.generateRandomNumber(50, 60));
+        productsByCategory.forEach((category, productList) -> {
+            System.out.println(category + ":");
+            productList.forEach(product -> System.out.println("  " + product));
+        });
     }
 }
