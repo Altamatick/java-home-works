@@ -1,4 +1,4 @@
-package main.java.app;
+package app;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -35,11 +35,11 @@ public class EmployeeDAO {
 
             if (resultSet.next()) {
                 return new Employee(
-                    resultSet.getInt("id"),
-                    resultSet.getString("name"),
-                    resultSet.getInt("age"),
-                    resultSet.getString("position"),
-                    resultSet.getFloat("salary")
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getInt("age"),
+                        resultSet.getString("position"),
+                        resultSet.getFloat("salary")
                 );
             }
         }
@@ -57,11 +57,11 @@ public class EmployeeDAO {
 
             while (resultSet.next()) {
                 Employee employee = new Employee(
-                    resultSet.getInt("id"),
-                    resultSet.getString("name"),
-                    resultSet.getInt("age"),
-                    resultSet.getString("position"),
-                    resultSet.getFloat("salary")
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getInt("age"),
+                        resultSet.getString("position"),
+                        resultSet.getFloat("salary")
                 );
                 employees.add(employee);
             }
@@ -113,11 +113,11 @@ public class EmployeeDAO {
 
             while (resultSet.next()) {
                 Employee employee = new Employee(
-                    resultSet.getInt("id"),
-                    resultSet.getString("name"),
-                    resultSet.getInt("age"),
-                    resultSet.getString("position"),
-                    resultSet.getFloat("salary")
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getInt("age"),
+                        resultSet.getString("position"),
+                        resultSet.getFloat("salary")
                 );
                 employees.add(employee);
             }
@@ -138,11 +138,11 @@ public class EmployeeDAO {
 
             while (resultSet.next()) {
                 Employee employee = new Employee(
-                    resultSet.getInt("id"),
-                    resultSet.getString("name"),
-                    resultSet.getInt("age"),
-                    resultSet.getString("position"),
-                    resultSet.getFloat("salary")
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getInt("age"),
+                        resultSet.getString("position"),
+                        resultSet.getFloat("salary")
                 );
                 employees.add(employee);
             }
