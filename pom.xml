@@ -39,11 +39,18 @@
             <version>42.7.0</version>
         </dependency>
 
-        <!-- SLF4J simple logger (щоб Hibernate не лаявся про logging) -->
+        <!-- SLF4J API -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
+            <artifactId>slf4j-api</artifactId>
             <version>2.0.13</version>
+        </dependency>
+
+        <!-- Logback Classic (включає logback-core і реалізацію SLF4J) -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.6</version>
         </dependency>
 
         <!-- H2 in-memory DB для локального запуску -->
