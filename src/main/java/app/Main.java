@@ -14,7 +14,9 @@ public class Main {
             em.getTransaction().begin();
 
             // Створюємо нового студента
-            Student student = new Student("Denys");
+            Student student = new Student();
+            student.setFirstName("John");
+            student.setLastName("Doe");
             em.persist(student);
 
             // Комітимо, щоб запис з'явився в БД
