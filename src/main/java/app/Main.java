@@ -17,6 +17,7 @@ public class Main {
             Student student = new Student();
             student.setFirstName("John");
             student.setLastName("Doe");
+            student.setEmail("john.doe@example.com");
             em.persist(student);
 
             // Комітимо, щоб запис з'явився в БД
