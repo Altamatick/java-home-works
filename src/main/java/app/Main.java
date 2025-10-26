@@ -1,39 +1,39 @@
 package app;
 
-import java.sql.SQLException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 public class Main {
     public static void main(String[] args) {
-        DatabaseInitializer dbInitializer = new DatabaseInitializer();
+        System.out.println("Starting Hibernate...");
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("hillel-persistence-unit");
+        EntityManager em = emf.createEntityManager();
 
         try {
-            // 1. Створення таблиці sales
-            dbInitializer.createSalesTable();
+            em.getTransaction().begin();
 
-            // 2. Створення таблиці employees
-            dbInitializer.createEmployeesTable();
+            // Створюємо нового студента
+            Student student = new Student("Denys");
+            em.persist(student);
 
-            // 3. Демонстрація роботи з EmployeeDAO
-            dbInitializer.demonstrateEmployeeDAO();
+            // Комітимо, щоб запис з'явився в БД
+            em.getTransaction().commit();
 
-            // 4. Вставка даних про продукти
-            dbInitializer.insertSalesData();
+            // Перевіряємо, що можна зчитати назад
+            Student found = em.find(Student.class, student.getId());
+            System.out.println("Found student: " + found);
 
-            // 5. Вибірка всіх записів
-            dbInitializer.selectAllSales();
-
-            // 6. Вибірка з обмеженням (LIMIT 2)
-            dbInitializer.selectLimitedSales();
-
-            // 7. Обчислення загальної вартості (SUM)
-            dbInitializer.calculateTotalValue();
-
-            // 8. Групування даних (GROUP BY)
-            dbInitializer.groupByProduct();
-
-        } catch (SQLException e) {
-            System.err.println("Помилка при роботі з базою даних: " + e.getMessage());
+        } catch (Exception e) {
             e.printStackTrace();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+        } finally {
+            em.close();
+            emf.close();
         }
+
+        System.out.println("Shutdown complete.");
     }
 }
