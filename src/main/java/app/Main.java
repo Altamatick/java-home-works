@@ -1,4 +1,4 @@
-package app;
+package main.java.app;
 
 import java.sql.SQLException;
 
@@ -10,19 +10,25 @@ public class Main {
             // 1. Створення таблиці sales
             dbInitializer.createSalesTable();
 
-            // 2. Вставка даних про продукти
+            // 2. Створення таблиці employees
+            dbInitializer.createEmployeesTable();
+
+            // 3. Демонстрація роботи з EmployeeDAO
+            dbInitializer.demonstrateEmployeeDAO();
+
+            // 4. Вставка даних про продукти
             dbInitializer.insertSalesData();
 
-            // 3. Вибірка всіх записів
+            // 5. Вибірка всіх записів
             dbInitializer.selectAllSales();
 
-            // 4. Вибірка з обмеженням (LIMIT 2)
+            // 6. Вибірка з обмеженням (LIMIT 2)
             dbInitializer.selectLimitedSales();
 
-            // 5. Обчислення загальної вартості (SUM)
+            // 7. Обчислення загальної вартості (SUM)
             dbInitializer.calculateTotalValue();
 
-            // 6. Групування даних (GROUP BY)
+            // 8. Групування даних (GROUP BY)
             dbInitializer.groupByProduct();
 
         } catch (SQLException e) {
