@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Калькулятор</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <main class="calculator-root" role="main" aria-label="Калькулятор">
+    <h1 class="visually-hidden">Калькулятор</h1>
+
+    <div class="calculator">
+      <div class="display" id="display" aria-live="polite">
+        <div class="expr" id="expression">0</div>
+        <div class="result" id="result">&nbsp;</div>
+      </div>
+
+      <div class="buttons" role="group" aria-label="Кнопки калькулятора">
+        <!-- Top row: clear, backspace, parentheses, divide -->
+        <button class="btn control" data-action="clear">C</button>
+        <button class="btn control" data-action="backspace">←</button>
+        <button class="btn op" data-value="(">(</button>
+        <button class="btn op" data-value=")">)</button>
+
+        <button class="btn digit" data-value="7">7</button>
+        <button class="btn digit" data-value="8">8</button>
+        <button class="btn digit" data-value="9">9</button>
+        <button class="btn op" data-value="/">÷</button>
+
+        <button class="btn digit" data-value="4">4</button>
+        <button class="btn digit" data-value="5">5</button>
+        <button class="btn digit" data-value="6">6</button>
+        <button class="btn op" data-value="*">×</button>
+
+        <button class="btn digit" data-value="1">1</button>
+        <button class="btn digit" data-value="2">2</button>
+        <button class="btn digit" data-value="3">3</button>
+        <button class="btn op" data-value="-">−</button>
+
+        <button class="btn digit zero" data-value="0">0</button>
+        <button class="btn digit" data-value=".">.</button>
+        <button class="btn equals" data-action="equals">=</button>
+        <button class="btn op" data-value="+">+</button>
+      </div>
+    </div>
+
+    <p class="hint">Ви можете використовувати клавіатуру: цифри, + - * /, Enter для =, Backspace для видалення, Esc для очищення.</p>
+  </main>
+
+  <script src="./js/script.js"></script>
+</body>
+</html>

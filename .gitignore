@@ -1,5 +1,1 @@
 .idea
-output
-files/*
-!files/.gitkeep
-target
