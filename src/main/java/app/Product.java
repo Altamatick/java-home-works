@@ -1,19 +1,33 @@
 package app;
 
+import jakarta.persistence.*;
 import java.util.Objects;
 
+@Entity
+@Table(name = "products")
 public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
-    private Double cost;
+
+    @Column(nullable = false)
+    private Double price;
 
     public Product() {
     }
 
-    public Product(Long id, String name, Double cost) {
+    public Product(String name, Double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public Product(Long id, String name, Double price) {
         this.id = id;
         this.name = name;
-        this.cost = cost;
+        this.price = price;
     }
 
     public Long getId() {
@@ -32,12 +46,12 @@ public class Product {
         this.name = name;
     }
 
-    public Double getCost() {
-        return cost;
+    public Double getPrice() {
+        return price;
     }
 
-    public void setCost(Double cost) {
-        this.cost = cost;
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     @Override
@@ -45,14 +59,12 @@ public class Product {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Objects.equals(id, product.id) &&
-               Objects.equals(name, product.name) &&
-               Objects.equals(cost, product.cost);
+        return Objects.equals(id, product.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, cost);
+        return Objects.hash(id);
     }
 
     @Override
@@ -60,7 +72,7 @@ public class Product {
         return "Product{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", cost=" + cost +
+                ", price=" + price +
                 '}';
     }
 }

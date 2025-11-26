@@ -1,108 +1,150 @@
 package app;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderTest {
 
-    @Test
-    void testOrderCreation() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Product> products = Arrays.asList(
-            new Product(1L, "Ноутбук", 25000.0),
-            new Product(2L, "Миша", 800.0)
-        );
+    private Order order;
+    private Product product1;
+    private Product product2;
 
-        Order order = new Order(1L, now, 25800.0, products);
-
-        assertNotNull(order);
-        assertEquals(1L, order.getId());
-        assertEquals(now, order.getCreationDate());
-        assertEquals(25800.0, order.getTotalCost());
-        assertEquals(2, order.getProducts().size());
+    @BeforeEach
+    void setUp() {
+        product1 = new Product("Laptop", 1200.0);
+        product2 = new Product("Mouse", 25.0);
+        order = new Order();
     }
 
     @Test
-    void testOrderDefaultConstructor() {
-        Order order = new Order();
+    void constructor_ShouldInitializeWithDefaultValues() {
+        Order newOrder = new Order();
 
-        assertNotNull(order);
-        assertNull(order.getId());
-        assertNull(order.getCreationDate());
-        assertNull(order.getTotalCost());
-        assertNotNull(order.getProducts());
-        assertTrue(order.getProducts().isEmpty());
+        assertThat(newOrder.getId()).isNull();
+        assertThat(newOrder.getProducts()).isNotNull();
+        assertThat(newOrder.getCreatedAt()).isNotNull();
     }
 
     @Test
-    void testOrderSetters() {
-        Order order = new Order();
-        LocalDateTime now = LocalDateTime.now();
-        List<Product> products = Arrays.asList(
-            new Product(1L, "Товар", 1000.0)
-        );
+    void constructor_ShouldInitializeWithParameters() {
+        List<Product> products = Arrays.asList(product1, product2);
+        Order newOrder = new Order(1225.0, products);
 
-        order.setId(5L);
-        order.setCreationDate(now);
-        order.setTotalCost(1000.0);
+        assertThat(newOrder.getTotalCost()).isEqualTo(1225.0);
+        assertThat(newOrder.getProducts()).hasSize(2);
+        assertThat(newOrder.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void constructor_ShouldInitializeWithNullProducts() {
+        Order newOrder = new Order(100.0, null);
+
+        assertThat(newOrder.getProducts()).isNotNull();
+        assertThat(newOrder.getProducts()).isEmpty();
+    }
+
+    @Test
+    void setId_ShouldSetId() {
+        order.setId(1L);
+
+        assertThat(order.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void setTotalCost_ShouldSetTotalCost() {
+        order.setTotalCost(1500.0);
+
+        assertThat(order.getTotalCost()).isEqualTo(1500.0);
+    }
+
+    @Test
+    void setProducts_ShouldSetProducts() {
+        List<Product> products = Arrays.asList(product1, product2);
         order.setProducts(products);
 
-        assertEquals(5L, order.getId());
-        assertEquals(now, order.getCreationDate());
-        assertEquals(1000.0, order.getTotalCost());
-        assertEquals(1, order.getProducts().size());
+        assertThat(order.getProducts()).hasSize(2);
+        assertThat(order.getProducts()).containsExactly(product1, product2);
     }
 
     @Test
-    void testOrderEquals() {
+    void setCreatedAt_ShouldSetCreatedAt() {
         LocalDateTime now = LocalDateTime.now();
-        List<Product> products = Arrays.asList(
-            new Product(1L, "Товар", 1000.0)
-        );
+        order.setCreatedAt(now);
 
-        Order order1 = new Order(1L, now, 1000.0, products);
-        Order order2 = new Order(1L, now, 1000.0, products);
-        Order order3 = new Order(2L, now, 1000.0, products);
-
-        assertEquals(order1, order2);
-        assertNotEquals(order1, order3);
+        assertThat(order.getCreatedAt()).isEqualTo(now);
     }
 
     @Test
-    void testOrderHashCode() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Product> products = Arrays.asList(
-            new Product(1L, "Товар", 1000.0)
-        );
+    void equals_ShouldReturnTrue_WhenOrdersHaveSameId() {
+        order.setId(1L);
+        Order otherOrder = new Order();
+        otherOrder.setId(1L);
 
-        Order order1 = new Order(1L, now, 1000.0, products);
-        Order order2 = new Order(1L, now, 1000.0, products);
-
-        assertEquals(order1.hashCode(), order2.hashCode());
+        assertThat(order).isEqualTo(otherOrder);
     }
 
     @Test
-    void testOrderToString() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Product> products = Arrays.asList(
-            new Product(1L, "Товар", 1000.0)
-        );
+    void equals_ShouldReturnFalse_WhenOrdersHaveDifferentId() {
+        order.setId(1L);
+        Order otherOrder = new Order();
+        otherOrder.setId(2L);
 
-        Order order = new Order(1L, now, 1000.0, products);
-        String toString = order.toString();
-
-        assertTrue(toString.contains("id=1"));
-        assertTrue(toString.contains("totalCost=1000.0"));
+        assertThat(order).isNotEqualTo(otherOrder);
     }
 
     @Test
-    void testOrderWithNullProducts() {
-        Order order = new Order(1L, LocalDateTime.now(), 0.0, null);
+    void equals_ShouldReturnTrue_WhenComparingWithItself() {
+        assertThat(order).isEqualTo(order);
+    }
 
-        assertNotNull(order.getProducts());
-        assertTrue(order.getProducts().isEmpty());
+    @Test
+    void equals_ShouldReturnFalse_WhenComparingWithNull() {
+        assertThat(order.equals(null)).isFalse();
+    }
+
+    @Test
+    void equals_ShouldReturnFalse_WhenComparingWithDifferentClass() {
+        assertThat(order.equals(new String("test"))).isFalse();
+    }
+
+    @Test
+    void hashCode_ShouldReturnSameValue_ForOrdersWithSameId() {
+        order.setId(1L);
+        Order otherOrder = new Order();
+        otherOrder.setId(1L);
+
+        assertThat(order.hashCode()).isEqualTo(otherOrder.hashCode());
+    }
+
+    @Test
+    void toString_ShouldReturnCorrectFormat() {
+        order.setId(1L);
+        order.setTotalCost(1225.0);
+        order.setProducts(Arrays.asList(product1, product2));
+
+        String result = order.toString();
+
+        assertThat(result).contains("id=1");
+        assertThat(result).contains("totalCost=1225.0");
+        assertThat(result).contains("productsCount=2");
+        assertThat(result).contains("createdAt=");
+    }
+
+    @Test
+    void toString_ShouldHandleNullProducts() {
+        order.setId(1L);
+        order.setTotalCost(100.0);
+        order.setProducts(null);
+
+        String result = order.toString();
+
+        assertThat(result).contains("productsCount=0");
     }
 }
+

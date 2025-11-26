@@ -1,68 +1,129 @@
 package app;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ProductTest {
 
-    @Test
-    void testProductCreation() {
-        Product product = new Product(1L, "Ноутбук", 25000.0);
+    private Product product;
 
-        assertNotNull(product);
-        assertEquals(1L, product.getId());
-        assertEquals("Ноутбук", product.getName());
-        assertEquals(25000.0, product.getCost());
+    @BeforeEach
+    void setUp() {
+        product = new Product();
     }
 
     @Test
-    void testProductDefaultConstructor() {
-        Product product = new Product();
+    void constructor_ShouldInitializeWithDefaultValues() {
+        Product newProduct = new Product();
 
-        assertNotNull(product);
-        assertNull(product.getId());
-        assertNull(product.getName());
-        assertNull(product.getCost());
+        assertThat(newProduct.getId()).isNull();
+        assertThat(newProduct.getName()).isNull();
+        assertThat(newProduct.getPrice()).isNull();
     }
 
     @Test
-    void testProductSetters() {
-        Product product = new Product();
+    void constructor_ShouldInitializeWithNameAndPrice() {
+        Product newProduct = new Product("Laptop", 1200.0);
 
-        product.setId(2L);
-        product.setName("Миша");
-        product.setCost(800.0);
-
-        assertEquals(2L, product.getId());
-        assertEquals("Миша", product.getName());
-        assertEquals(800.0, product.getCost());
+        assertThat(newProduct.getName()).isEqualTo("Laptop");
+        assertThat(newProduct.getPrice()).isEqualTo(1200.0);
+        assertThat(newProduct.getId()).isNull();
     }
 
     @Test
-    void testProductEquals() {
-        Product product1 = new Product(1L, "Ноутбук", 25000.0);
-        Product product2 = new Product(1L, "Ноутбук", 25000.0);
-        Product product3 = new Product(2L, "Миша", 800.0);
+    void constructor_ShouldInitializeWithAllParameters() {
+        Product newProduct = new Product(1L, "Laptop", 1200.0);
 
-        assertEquals(product1, product2);
-        assertNotEquals(product1, product3);
+        assertThat(newProduct.getId()).isEqualTo(1L);
+        assertThat(newProduct.getName()).isEqualTo("Laptop");
+        assertThat(newProduct.getPrice()).isEqualTo(1200.0);
     }
 
     @Test
-    void testProductHashCode() {
-        Product product1 = new Product(1L, "Ноутбук", 25000.0);
-        Product product2 = new Product(1L, "Ноутбук", 25000.0);
+    void setId_ShouldSetId() {
+        product.setId(1L);
 
-        assertEquals(product1.hashCode(), product2.hashCode());
+        assertThat(product.getId()).isEqualTo(1L);
     }
 
     @Test
-    void testProductToString() {
-        Product product = new Product(1L, "Ноутбук", 25000.0);
-        String toString = product.toString();
+    void setName_ShouldSetName() {
+        product.setName("Mouse");
 
-        assertTrue(toString.contains("id=1"));
-        assertTrue(toString.contains("name='Ноутбук'"));
-        assertTrue(toString.contains("cost=25000.0"));
+        assertThat(product.getName()).isEqualTo("Mouse");
+    }
+
+    @Test
+    void setPrice_ShouldSetPrice() {
+        product.setPrice(25.0);
+
+        assertThat(product.getPrice()).isEqualTo(25.0);
+    }
+
+    @Test
+    void equals_ShouldReturnTrue_WhenProductsHaveSameId() {
+        product.setId(1L);
+        Product otherProduct = new Product();
+        otherProduct.setId(1L);
+
+        assertThat(product).isEqualTo(otherProduct);
+    }
+
+    @Test
+    void equals_ShouldReturnFalse_WhenProductsHaveDifferentId() {
+        product.setId(1L);
+        Product otherProduct = new Product();
+        otherProduct.setId(2L);
+
+        assertThat(product).isNotEqualTo(otherProduct);
+    }
+
+    @Test
+    void equals_ShouldReturnTrue_WhenComparingWithItself() {
+        assertThat(product).isEqualTo(product);
+    }
+
+    @Test
+    void equals_ShouldReturnFalse_WhenComparingWithNull() {
+        assertThat(product.equals(null)).isFalse();
+    }
+
+    @Test
+    void equals_ShouldReturnFalse_WhenComparingWithDifferentClass() {
+        assertThat(product.equals(new String("test"))).isFalse();
+    }
+
+    @Test
+    void hashCode_ShouldReturnSameValue_ForProductsWithSameId() {
+        product.setId(1L);
+        Product otherProduct = new Product();
+        otherProduct.setId(1L);
+
+        assertThat(product.hashCode()).isEqualTo(otherProduct.hashCode());
+    }
+
+    @Test
+    void toString_ShouldReturnCorrectFormat() {
+        product.setId(1L);
+        product.setName("Laptop");
+        product.setPrice(1200.0);
+
+        String result = product.toString();
+
+        assertThat(result).contains("id=1");
+        assertThat(result).contains("name='Laptop'");
+        assertThat(result).contains("price=1200.0");
+    }
+
+    @Test
+    void toString_ShouldHandleNullValues() {
+        String result = product.toString();
+
+        assertThat(result).contains("id=null");
+        assertThat(result).contains("name='null'");
+        assertThat(result).contains("price=null");
     }
 }
+

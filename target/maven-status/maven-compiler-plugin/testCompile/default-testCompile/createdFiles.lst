@@ -1,0 +1,6 @@
+app/PingControllerTest.class
+app/OrderTest.class
+app/OrderControllerIntegrationTest.class
+app/ProductTest.class
+app/OrderRepositoryTest.class
+app/OrderControllerTest.class

@@ -1,25 +1,40 @@
 package app;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "orders")
 public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime creationDate;
+
+    @Column(nullable = false)
     private Double totalCost;
-    private List<Product> products;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "order_products",
+        joinColumns = @JoinColumn(name = "order_id"),
+        inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<Product> products = new ArrayList<>();
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     public Order() {
-        this.products = new ArrayList<>();
+        this.createdAt = LocalDateTime.now();
     }
 
-    public Order(Long id, LocalDateTime creationDate, Double totalCost, List<Product> products) {
-        this.id = id;
-        this.creationDate = creationDate;
+    public Order(Double totalCost, List<Product> products) {
         this.totalCost = totalCost;
         this.products = products != null ? products : new ArrayList<>();
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -28,14 +43,6 @@ public class Order {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
     }
 
     public Double getTotalCost() {
@@ -54,29 +61,34 @@ public class Order {
         this.products = products;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return Objects.equals(id, order.id) &&
-               Objects.equals(creationDate, order.creationDate) &&
-               Objects.equals(totalCost, order.totalCost) &&
-               Objects.equals(products, order.products);
+        return Objects.equals(id, order.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, creationDate, totalCost, products);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         return "Order{" +
                 "id=" + id +
-                ", creationDate=" + creationDate +
                 ", totalCost=" + totalCost +
-                ", products=" + products +
+                ", productsCount=" + (products != null ? products.size() : 0) +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

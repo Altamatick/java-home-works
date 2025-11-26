@@ -2,4 +2,4 @@
 output
 files/*
 !files/.gitkeep
-target
+target.DS_Store
