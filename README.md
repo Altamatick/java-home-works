@@ -1,74 +1,163 @@
-# Customer Management System
+# Order Management System
 
-Проєкт для управління клієнтами з використанням Spring Boot, JdbcTemplate та PostgreSQL.
+REST API для управління замовленнями з використанням Spring Boot.
 
 ## Структура проєкту
 
-- `Customer` - клас сутності клієнта
-- `CustomerDao` - DAO клас для роботи з базою даних
-- `CustomerRowMapper` - маппер для конвертації записів БД в Java-об'єкти
-- `DatabaseConfig` - конфігурація бази даних
-- `DatabaseInitializer` - автоматичне створення таблиці при старті
+- `Product` - клас товару (id, name, cost)
+- `Order` - клас замовлення (id, creationDate, totalCost, products)
+- `OrderRepository` - репозиторій для зберігання замовлень в пам'яті
+- `PingController` - контролер для перевірки роботи додатку
+- `OrderController` - REST контролер для роботи з замовленнями
 
 ## Запуск
-
-### 1. Запустити PostgreSQL в Docker
-
-```bash
-cd docker
-docker-compose up -d
-```
-
-### 2. Створити таблицю вручну (опціонально)
-
-Якщо автоматична ініціалізація не спрацює, можна створити таблицю вручну:
-
-```sql
-CREATE TABLE customer (
-    id BIGSERIAL PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    social_security_number VARCHAR(50) NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### 3. Запустити додаток
 
 ```bash
 mvn spring-boot:run
 ```
 
-## Використання CustomerDao
+Додаток буде доступний за адресою: http://localhost:8080
 
-```java
-@Autowired
-private CustomerDao customerDao;
+## API Endpoints
 
-// Додавання клієнта
-Customer customer = new Customer("Іван Петренко", "ivan@example.com", "1234567890");
-Customer saved = customerDao.add(customer);
+### 1. Ping (перевірка роботи)
 
-// Пошук по id
-Optional<Customer> found = customerDao.findById(1L);
-
-// Оновлення
-customer.setFullName("Іван Іванович Петренко");
-customerDao.update(customer);
-
-// Видалення
-customerDao.deleteById(1L);
-
-// Отримання всіх
-List<Customer> allCustomers = customerDao.findAll();
+```http
+GET http://localhost:8080/ping
 ```
 
-## Налаштування
-
-Параметри підключення до БД знаходяться в `src/main/resources/application.properties`:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/my_database
-spring.datasource.username=myuser
-spring.datasource.password=mypassword
+**Відповідь:**
 ```
+OK
+```
+
+### 2. Отримання всіх замовлень
+
+```http
+GET http://localhost:8080/orders
+```
+
+**Відповідь:**
+```json
+[
+  {
+    "id": 1,
+    "creationDate": "2025-11-16T10:30:00",
+    "totalCost": 25800.0,
+    "products": [
+      {
+        "id": 1,
+        "name": "Ноутбук",
+        "cost": 25000.0
+      },
+      {
+        "id": 2,
+        "name": "Миша",
+        "cost": 800.0
+      }
+    ]
+  }
+]
+```
+
+### 3. Отримання конкретного замовлення
+
+```http
+GET http://localhost:8080/orders/{id}
+```
+
+**Приклад:**
+```http
+GET http://localhost:8080/orders/1
+```
+
+**Відповідь:**
+```json
+{
+  "id": 1,
+  "creationDate": "2025-11-16T10:30:00",
+  "totalCost": 25800.0,
+  "products": [
+    {
+      "id": 1,
+      "name": "Ноутбук",
+      "cost": 25000.0
+    }
+  ]
+}
+```
+
+### 4. Додавання нового замовлення
+
+```http
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 5,
+      "name": "Клавіатура",
+      "cost": 2000.0
+    },
+    {
+      "id": 6,
+      "name": "Миша",
+      "cost": 800.0
+    }
+  ]
+}
+```
+
+**Відповідь:**
+```json
+{
+  "id": 3,
+  "creationDate": "2025-11-18T16:55:00",
+  "totalCost": 2800.0,
+  "products": [
+    {
+      "id": 5,
+      "name": "Клавіатура",
+      "cost": 2000.0
+    },
+    {
+      "id": 6,
+      "name": "Миша",
+      "cost": 800.0
+    }
+  ]
+}
+```
+
+## Тестування через curl
+
+```bash
+# Перевірка роботи
+curl http://localhost:8080/ping
+
+# Отримання всіх замовлень
+curl http://localhost:8080/orders
+
+# Отримання замовлення по id
+curl http://localhost:8080/orders/1
+
+# Додавання нового замовлення
+curl -X POST http://localhost:8080/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "products": [
+      {"id": 5, "name": "Клавіатура", "cost": 2000.0},
+      {"id": 6, "name": "Миша", "cost": 800.0}
+    ]
+  }'
+```
+
+## Особливості
+
+- Замовлення зберігаються в пам'яті (без БД)
+- При додаванні замовлення автоматично:
+  - Генерується id
+  - Встановлюється дата створення
+  - Обчислюється загальна вартість (якщо не вказана)
+- Репозиторій ініціалізується з двома тестовими замовленнями
