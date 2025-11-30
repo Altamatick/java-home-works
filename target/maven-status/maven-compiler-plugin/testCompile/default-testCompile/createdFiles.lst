@@ -1,6 +1,7 @@
-app/PingControllerTest.class
-app/OrderTest.class
-app/OrderControllerIntegrationTest.class
-app/ProductTest.class
-app/OrderRepositoryTest.class
-app/OrderControllerTest.class
+app/ApplicationTest.class
+app/UserServiceTest.class
+app/UserControllerTest.class
+app/UserTest.class
+app/PostRepositoryTest.class
+app/UserRepositoryTest.class
+app/PostTest.class

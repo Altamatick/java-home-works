@@ -1,6 +1,7 @@
-/Users/den/Projects/java/src/main/java/app/PingController.java
-/Users/den/Projects/java/src/main/java/app/Order.java
-/Users/den/Projects/java/src/main/java/app/OrderController.java
+/Users/den/Projects/java/src/main/java/app/UserRepository.java
+/Users/den/Projects/java/src/main/java/app/User.java
+/Users/den/Projects/java/src/main/java/app/UserService.java
+/Users/den/Projects/java/src/main/java/app/PostRepository.java
+/Users/den/Projects/java/src/main/java/app/Post.java
 /Users/den/Projects/java/src/main/java/app/Application.java
-/Users/den/Projects/java/src/main/java/app/Product.java
-/Users/den/Projects/java/src/main/java/app/OrderRepository.java
+/Users/den/Projects/java/src/main/java/app/UserController.java

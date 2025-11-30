@@ -1,6 +1,8 @@
+app/User.class
+app/PostRepository.class
 app/Application.class
-app/Product.class
-app/OrderController.class
-app/Order.class
-app/OrderRepository.class
-app/PingController.class
+app/Post.class
+app/UserController$CreateUserWithPostsRequest.class
+app/UserController.class
+app/UserRepository.class
+app/UserService.class
