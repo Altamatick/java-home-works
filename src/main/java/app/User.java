@@ -1,10 +1,9 @@
 package app;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -19,16 +18,28 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Post> posts = new ArrayList<>();
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(nullable = false)
+    private String password;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
     }
 
-    public User(String name, String email) {
+    public User(String name, String email, String phone, String password) {
         this.name = name;
         this.email = email;
+        this.phone = phone;
+        this.password = password;
     }
 
     public Long getId() {
@@ -55,22 +66,38 @@ public class User {
         this.email = email;
     }
 
-    public List<Post> getPosts() {
-        return posts;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public void addPost(Post post) {
-        posts.add(post);
-        post.setUser(this);
+    public String getPassword() {
+        return password;
     }
 
-    public void removePost(Post post) {
-        posts.remove(post);
-        post.setUser(null);
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+        role.getUsers().add(this);
+    }
+
+    public void removeRole(Role role) {
+        this.roles.remove(role);
+        role.getUsers().remove(this);
     }
 
     @Override
@@ -92,7 +119,8 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", postsCount=" + (posts != null ? posts.size() : 0) +
+                ", phone='" + phone + '\'' +
+                ", roles=" + roles +
                 '}';
     }
 }

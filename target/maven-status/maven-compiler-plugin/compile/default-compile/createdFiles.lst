@@ -1,8 +1,0 @@
-app/User.class
-app/PostRepository.class
-app/Application.class
-app/Post.class
-app/UserController$CreateUserWithPostsRequest.class
-app/UserController.class
-app/UserRepository.class
-app/UserService.class

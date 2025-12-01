@@ -4,16 +4,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("h2")
+@ActiveProfiles("test")
 @Transactional
 class UserServiceTest {
 
@@ -24,124 +24,76 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Autowired
-    private PostRepository postRepository;
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
-        postRepository.deleteAll();
         userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        // Створити базові ролі
+        roleRepository.save(new Role("USER"));
+        roleRepository.save(new Role("ADMIN"));
     }
 
     @Test
-    void testCreateUser() {
-        User user = new User("John Doe", "john@example.com");
+    void testRegisterUser() {
+        User user = userService.registerUser("John Doe", "john@example.com", "555-1234", "password123");
 
-        User created = userService.createUser(user);
-
-        assertNotNull(created.getId());
-        assertEquals("John Doe", created.getName());
-        assertEquals("john@example.com", created.getEmail());
+        assertNotNull(user.getId());
+        assertEquals("John Doe", user.getName());
+        assertEquals("john@example.com", user.getEmail());
+        assertEquals("555-1234", user.getPhone());
+        assertTrue(passwordEncoder.matches("password123", user.getPassword()));
+        assertFalse(user.getRoles().isEmpty());
+        assertTrue(user.getRoles().stream().anyMatch(r -> r.getName().equals("USER")));
     }
 
     @Test
-    void testCreateUserWithPosts() {
-        User user = new User("John Doe", "john@example.com");
-        List<Post> posts = Arrays.asList(
-            new Post("Post 1", "Content 1"),
-            new Post("Post 2", "Content 2")
-        );
+    void testRegisterUserDuplicateEmail() {
+        userService.registerUser("John Doe", "john@example.com", "555-1234", "password123");
 
-        User created = userService.createUserWithPosts(user, posts);
-
-        assertNotNull(created.getId());
-        assertEquals(2, created.getPosts().size());
-        assertEquals(2, postRepository.findByUserId(created.getId()).size());
+        assertThrows(RuntimeException.class, () -> {
+            userService.registerUser("Jane Doe", "john@example.com", "555-5678", "password456");
+        });
     }
 
     @Test
-    void testGetUsersByName() {
-        userService.createUser(new User("John Doe", "john1@example.com"));
-        userService.createUser(new User("John Doe", "john2@example.com"));
-        userService.createUser(new User("Jane Doe", "jane@example.com"));
+    void testFindByEmail() {
+        userService.registerUser("John Doe", "john@example.com", "555-1234", "password123");
 
-        List<User> users = userService.getUsersByName("John Doe");
-
-        assertEquals(2, users.size());
-        assertTrue(users.stream().allMatch(u -> u.getName().equals("John Doe")));
-    }
-
-    @Test
-    void testGetUsersByEmailDomain() {
-        userService.createUser(new User("User1", "user1@gmail.com"));
-        userService.createUser(new User("User2", "user2@gmail.com"));
-        userService.createUser(new User("User3", "user3@yahoo.com"));
-
-        List<User> gmailUsers = userService.getUsersByEmailDomain("@gmail.com");
-
-        assertEquals(2, gmailUsers.size());
-        assertTrue(gmailUsers.stream().allMatch(u -> u.getEmail().endsWith("@gmail.com")));
-    }
-
-    @Test
-    void testGetPostsByUserId() {
-        User user = userService.createUser(new User("John Doe", "john@example.com"));
-        List<Post> posts = Arrays.asList(
-            new Post("Post 1", "Content 1"),
-            new Post("Post 2", "Content 2")
-        );
-        userService.createUserWithPosts(user, posts);
-
-        List<Post> userPosts = userService.getPostsByUserId(user.getId());
-
-        assertEquals(2, userPosts.size());
-    }
-
-    @Test
-    void testGetAllUsers() {
-        userService.createUser(new User("User1", "user1@example.com"));
-        userService.createUser(new User("User2", "user2@example.com"));
-
-        List<User> allUsers = userService.getAllUsers();
-
-        assertEquals(2, allUsers.size());
-    }
-
-    @Test
-    void testGetUserById() {
-        User created = userService.createUser(new User("John Doe", "john@example.com"));
-
-        User found = userService.getUserById(created.getId());
+        User found = userService.findByEmail("john@example.com");
 
         assertNotNull(found);
-        assertEquals(created.getId(), found.getId());
         assertEquals("John Doe", found.getName());
     }
 
     @Test
-    void testRollbackOnException() {
-        User user = new User("Test User Rollback", "testrollback@example.com");
-
-        // Перевіряємо, що виняток викидається
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            userService.createUserWithRollback(user, true);
+    void testFindByEmailNotFound() {
+        assertThrows(RuntimeException.class, () -> {
+            userService.findByEmail("nonexistent@example.com");
         });
-
-        assertEquals("Тестова помилка для перевірки rollback", exception.getMessage());
-
-        // Перевіряємо, що користувач не збережений (rollback спрацював)
-        // Оскільки тест має @Transactional, rollback відбувається автоматично
-        // Перевіряємо, що метод викинув виняток
-        assertNotNull(exception);
     }
 
     @Test
-    void testNoRollbackWhenNoException() {
-        User user = new User("Test User", "test@example.com");
+    void testGetAllUsers() {
+        userService.registerUser("User1", "user1@example.com", "555-1111", "pass1");
+        userService.registerUser("User2", "user2@example.com", "555-2222", "pass2");
 
-        User created = userService.createUserWithRollback(user, false);
+        List<User> users = userService.getAllUsers();
 
-        assertNotNull(created.getId());
-        List<User> users = userService.getUsersByName("Test User");
-        assertEquals(1, users.size());
+        assertEquals(2, users.size());
+    }
+
+    @Test
+    void testPasswordHashing() {
+        User user = userService.registerUser("John Doe", "john@example.com", "555-1234", "password123");
+
+        // Пароль має бути хешований, а не зберігатися як plain text
+        assertNotEquals("password123", user.getPassword());
+        assertTrue(user.getPassword().startsWith("$2a$") || user.getPassword().startsWith("$2b$"));
     }
 }

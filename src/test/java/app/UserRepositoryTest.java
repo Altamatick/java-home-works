@@ -6,25 +6,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@ActiveProfiles("h2")
+@ActiveProfiles("test")
 class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
+        roleRepository.deleteAll();
     }
 
     @Test
     void testSaveUser() {
-        User user = new User("John Doe", "john@example.com");
+        User user = new User("John Doe", "john@example.com", "555-1234", "password123");
 
         User saved = userRepository.save(user);
 
@@ -34,75 +38,37 @@ class UserRepositoryTest {
     }
 
     @Test
-    void testFindByName() {
-        userRepository.save(new User("John Doe", "john@example.com"));
-        userRepository.save(new User("John Smith", "john.smith@example.com"));
-        userRepository.save(new User("Jane Doe", "jane@example.com"));
+    void testFindByEmail() {
+        User user = new User("John Doe", "john@example.com", "555-1234", "password123");
+        userRepository.save(user);
 
-        List<User> users = userRepository.findByName("John Doe");
+        Optional<User> found = userRepository.findByEmail("john@example.com");
 
-        assertEquals(1, users.size());
-        assertEquals("John Doe", users.get(0).getName());
+        assertTrue(found.isPresent());
+        assertEquals("John Doe", found.get().getName());
     }
 
     @Test
-    void testFindByNameMultipleResults() {
-        userRepository.save(new User("John Doe", "john1@example.com"));
-        userRepository.save(new User("John Doe", "john2@example.com"));
+    void testFindByEmailNotFound() {
+        Optional<User> found = userRepository.findByEmail("nonexistent@example.com");
 
-        List<User> users = userRepository.findByName("John Doe");
-
-        assertEquals(2, users.size());
+        assertFalse(found.isPresent());
     }
 
     @Test
-    void testFindByEmailEndingWith() {
-        userRepository.save(new User("User1", "user1@gmail.com"));
-        userRepository.save(new User("User2", "user2@gmail.com"));
-        userRepository.save(new User("User3", "user3@yahoo.com"));
+    void testExistsByEmail() {
+        User user = new User("John Doe", "john@example.com", "555-1234", "password123");
+        userRepository.save(user);
 
-        List<User> gmailUsers = userRepository.findByEmailEndingWith("@gmail.com");
-
-        assertEquals(2, gmailUsers.size());
-        assertTrue(gmailUsers.stream().allMatch(u -> u.getEmail().endsWith("@gmail.com")));
-    }
-
-    @Test
-    void testFindByEmailEndingWithNoResults() {
-        userRepository.save(new User("User1", "user1@gmail.com"));
-
-        List<User> yahooUsers = userRepository.findByEmailEndingWith("@yahoo.com");
-
-        assertTrue(yahooUsers.isEmpty());
+        assertTrue(userRepository.existsByEmail("john@example.com"));
+        assertFalse(userRepository.existsByEmail("nonexistent@example.com"));
     }
 
     @Test
     void testFindAll() {
-        userRepository.save(new User("User1", "user1@example.com"));
-        userRepository.save(new User("User2", "user2@example.com"));
+        userRepository.save(new User("User1", "user1@example.com", "555-1111", "pass1"));
+        userRepository.save(new User("User2", "user2@example.com", "555-2222", "pass2"));
 
-        List<User> allUsers = userRepository.findAll();
-
-        assertEquals(2, allUsers.size());
-    }
-
-    @Test
-    void testFindById() {
-        User saved = userRepository.save(new User("John Doe", "john@example.com"));
-
-        User found = userRepository.findById(saved.getId()).orElse(null);
-
-        assertNotNull(found);
-        assertEquals(saved.getId(), found.getId());
-        assertEquals("John Doe", found.getName());
-    }
-
-    @Test
-    void testDeleteById() {
-        User saved = userRepository.save(new User("John Doe", "john@example.com"));
-
-        userRepository.deleteById(saved.getId());
-
-        assertFalse(userRepository.findById(saved.getId()).isPresent());
+        assertEquals(2, userRepository.findAll().size());
     }
 }

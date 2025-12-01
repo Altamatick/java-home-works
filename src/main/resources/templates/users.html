@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registered Users</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background-color: #667eea;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-header h2 {
+            font-size: 18px;
+            font-weight: normal;
+        }
+
+        .top-header nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .top-header a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .top-header a:hover {
+            text-decoration: underline;
+        }
+
+        .top-header form {
+            display: inline;
+        }
+
+        .top-header button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .top-header button:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #87CEEB;
+            color: #333;
+            font-weight: bold;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: white;
+        }
+
+        tbody tr:hover {
+            background-color: #e8e8e8;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <h2>Registration and Login System</h2>
+        <nav>
+            <a th:href="@{/register}">Register</a>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit">Logout</button>
+            </form>
+        </nav>
+    </div>
+
+    <div class="container">
+        <h1>Registered Users</h1>
+
+        <div th:if="${users != null and !users.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.name}"></td>
+                        <td th:text="${user.phone}"></td>
+                        <td th:text="${user.email}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${users == null or users.isEmpty()}" class="empty-message">
+            No users registered yet.
+        </div>
+    </div>
+</body>
+</html>

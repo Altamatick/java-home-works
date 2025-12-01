@@ -1,7 +1,0 @@
-app/ApplicationTest.class
-app/UserServiceTest.class
-app/UserControllerTest.class
-app/UserTest.class
-app/PostRepositoryTest.class
-app/UserRepositoryTest.class
-app/PostTest.class
